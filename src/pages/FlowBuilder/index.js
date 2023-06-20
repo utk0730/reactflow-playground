@@ -14,7 +14,22 @@ import { initialEdges, initialNodes } from "../../utils/constants";
 import { FlowbuilderWrapper, ReactFlowWrapper } from "./styled";
 import { v4 as uuidv4 } from "uuid";
 import { isValidNodeNetwork } from "../../utils/helper.functions";
+import { useSnackbar } from "react-simple-snackbar";
 const nodeTypes = { node: CustomNode };
+
+const snackBaroptions = {
+  position: "top-right",
+  style: {
+    backgroundColor: "white",
+    color: "blue",
+    fontSize: "14px",
+    textAlign: "center",
+  },
+  closeStyle: {
+    color: "blue",
+    fontSize: "16px",
+  },
+};
 
 const onDragOverHandler = (event) => {
   event.preventDefault();
@@ -22,6 +37,7 @@ const onDragOverHandler = (event) => {
 };
 
 const FlowBuilder = () => {
+  const [openSnackbar, closeSnackbar] = useSnackbar(snackBaroptions);
   const [nodeName, setNodeName] = useState("Node 1");
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -93,8 +109,14 @@ const FlowBuilder = () => {
   }, [nodeName, setNodes]);
 
   const saveNodesHandler = () => {
-    if (isValidNodeNetwork(nodes, edges)) alert("valid node network");
-    else alert("Flow can not be saved, Please connect nodes correctly ");
+    if (isValidNodeNetwork(nodes, edges)) {
+      openSnackbar("Valid node network", 3000);
+      return;
+    }
+    openSnackbar(
+      "Flow can not be saved, Please connect all nodes correctly ",
+      3000
+    );
   };
 
   const deleteNodeById = (id) => {
